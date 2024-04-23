@@ -17,7 +17,10 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -49,21 +52,11 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAokOXsETwcfXkaPCGocKURZAc4a7Xzy9s',
-    appId: '1:750024675568:web:b9bf62818dc476bef47235',
-    messagingSenderId: '750024675568',
-    projectId: 'cins467-s24-assignment6-7cb3f',
-    authDomain: 'cins467-s24-assignment6-7cb3f.firebaseapp.com',
-    storageBucket: 'cins467-s24-assignment6-7cb3f.appspot.com',
-    measurementId: 'G-DG4N9DV0S6',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBRhZKy401Y6nyBmWQpriwypxCM4oyefxo',
-    appId: '1:750024675568:android:e8c276a0174e076ff47235',
-    messagingSenderId: '750024675568',
-    projectId: 'cins467-s24-assignment6-7cb3f',
-    storageBucket: 'cins467-s24-assignment6-7cb3f.appspot.com',
+    apiKey: 'AIzaSyDpIkE43L89jTKK9zn6ORpa1DKFWxXJyko',
+    appId: '1:59077548890:android:3cb5e76378e0b45e133163',
+    messagingSenderId: '59077548890',
+    projectId: 'fooddelivery-finalproject',
+    storageBucket: 'fooddelivery-finalproject.appspot.com',
   );
 }

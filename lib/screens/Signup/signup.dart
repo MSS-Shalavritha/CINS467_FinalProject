@@ -97,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   try {
-    await _firestore.collection('Signup').doc('Users').set({
+    await FirebaseFirestore.instance.collection('Signup').add(<String, dynamic>{
       'FirstName': firstName,
       'LastName': lastName,
       'Email': email,
