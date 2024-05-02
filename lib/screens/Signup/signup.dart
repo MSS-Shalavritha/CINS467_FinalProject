@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -96,7 +94,36 @@ class _MyHomePageState extends State<MyHomePage> {
     return;
   }
 
+  if (!email.contains('@') || !email.endsWith('.com') || email.indexOf('@') > email.lastIndexOf('.com')) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Invalid email format')),
+    );
+    return;
+  }
+
+  if (phone.length != 10 || int.tryParse(phone) == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Phone number must be a 10-digit integer')),
+    );
+    return;
+  }
+
   try {
+    // Query Firestore to check if the email already exists
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('Signup')
+        .where('Email', isEqualTo: email)
+        .get();
+
+    // If the query snapshot is not empty, it means the email already exists
+    if (querySnapshot.docs.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('This email is already registered. Please use a different email.')),
+      );
+      return;
+    }
+
+    // If the email doesn't exist, proceed to register the user
     await FirebaseFirestore.instance.collection('Signup').add(<String, dynamic>{
       'FirstName': firstName,
       'LastName': lastName,
@@ -116,7 +143,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
 
   @override
   Widget build(BuildContext context) {
@@ -145,14 +171,17 @@ class _MyHomePageState extends State<MyHomePage> {
               TextField(
                 controller: phoneController,
                 decoration: const InputDecoration(labelText: 'Phone'),
+                keyboardType: TextInputType.number,
               ),
               TextField(
                 controller: passwordController,
                 decoration: const InputDecoration(labelText: 'Password'),
+                obscureText: true,
               ),
               TextField(
                 controller: confirmPasswordController,
                 decoration: const InputDecoration(labelText: 'Confirm Password'),
+                obscureText: true,
               ),
               TextField(
                 controller: customerorownerController,
