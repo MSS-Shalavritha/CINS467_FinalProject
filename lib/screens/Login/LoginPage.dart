@@ -1,23 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:assignment_project/screens/CustomerPage/CustomerView.dart';
+import 'package:assignment_project/screens/RestaurantView/RestaurantView.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({Key? key}) : super(key: key);
 
-  // Create an instance of FirebaseAuth
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  void _loginUser(BuildContext context, String email, String password) async {
+  Future<void> _loginUser(BuildContext context, String email, String password) async {
     try {
       // Sign in the user with email and password
-      await _auth.signInWithEmailAndPassword(
+      final userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      // Display a success message if login is successful
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login successful')),
-      );
+
+      // Retrieve user data from Firestore based on authentication UID
+      final userSnapshot = await _firestore.collection('signup').doc(userCredential.user!.uid).get();
+      
+      if (userSnapshot.exists) {
+        final userData = userSnapshot.data();
+        final userRole = userData?['CustomerorOwner'];
+
+        // Navigate to respective view based on user role
+        if (userRole == 'Owner') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => RestaurantFormPage(title: 'Restaurant Information')),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => CustomerView()),
+          );
+        }
+
+        // Display a success message if login is successful
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login successful')),
+        );
+      } else {
+        // Handle case where user data is not found
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to retrieve user data')),
+        );
+      }
     } catch (e) {
       // Display an error message if login fails
       ScaffoldMessenger.of(context).showSnackBar(
