@@ -193,3 +193,56 @@ class _RestaurantMapState extends State<RestaurantMap> {
   }
 }
 
+// import 'package:flutter/material.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+// class RestaurantFormPage extends StatelessWidget {
+//   const RestaurantFormPage({Key? key, required this.title}) : super(key: key);
+
+//   final String title;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text(title),
+//       ),
+//       body: RestaurantMap(),
+//     );
+//   }
+// }
+
+// class RestaurantMap extends StatefulWidget {
+//   @override
+//   _RestaurantMapState createState() => _RestaurantMapState();
+// }
+
+// class _RestaurantMapState extends State<RestaurantMap> {
+//   late GoogleMapController mapController;
+//   final LatLng _center = const LatLng(45.521563, -122.677433); // Initial center location
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return GoogleMap(
+//       onMapCreated: (GoogleMapController controller) {
+//         setState(() {
+//           mapController = controller;
+//         });
+//       },
+//       initialCameraPosition: CameraPosition(
+//         target: _center,
+//         zoom: 15.0,
+//       ),
+//       markers: {
+//         Marker(
+//           markerId: MarkerId('restaurantLocation'),
+//           position: _center,
+//           infoWindow: const InfoWindow(
+//             title: 'Restaurant Location',
+//           ),
+//         ),
+//       },
+//     );
+//   }
+// }
+

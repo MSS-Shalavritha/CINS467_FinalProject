@@ -27,9 +27,5 @@
                 <data android:scheme="http" android:host="example.com"/>
             </intent-filter>
         </activity>
-        <!-- Add Google Maps API Key -->
-        <meta-data
-            android:name="com.google.android.geo.AIzaSyDIlWmed4QhkkfUEz_cDNoolX_CmZBF7Nw"
-            android:value="AIzaSyDIlWmed4QhkkfUEz_cDNoolX_CmZBF7Nw"/>
     </application>
 </manifest>
