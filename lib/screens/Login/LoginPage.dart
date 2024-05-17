@@ -12,20 +12,15 @@ class LoginPage extends StatelessWidget {
 
   Future<void> _loginUser(BuildContext context, String email, String password) async {
     try {
-      // Sign in the user with email and password
       final userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-
-      // Retrieve user data from Firestore based on authentication UID
       final userSnapshot = await _firestore.collection('signup').doc(userCredential.user!.uid).get();
       
       if (userSnapshot.exists) {
         final userData = userSnapshot.data();
         final userRole = userData?['CustomerorOwner'];
-
-        // Navigate to respective view based on user role
         if (userRole == 'Owner') {
           Navigator.pushReplacement(
             context,
@@ -34,22 +29,18 @@ class LoginPage extends StatelessWidget {
         } else {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => CustomerView()),
+            MaterialPageRoute(builder: (context) => CustomerViewPage()),
           );
         }
-
-        // Display a success message if login is successful
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Login successful')),
         );
       } else {
-        // Handle case where user data is not found
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to retrieve user data')),
         );
       }
     } catch (e) {
-      // Display an error message if login fails
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to login. Please check your credentials.')),
       );
@@ -65,6 +56,7 @@ class LoginPage extends StatelessWidget {
       backgroundColor: Colors.yellow[100],
       appBar: AppBar(
         title: const Text('Login Page'),
+        backgroundColor: Colors.yellow[100],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -104,7 +96,6 @@ class LoginPage extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                // Handle Forgot Password
               },
               child: Text(
                 'Forgot Password?',
@@ -113,7 +104,6 @@ class LoginPage extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                // Call the login function with entered email and password
                 _loginUser(context, emailController.text, passwordController.text);
               },
               style: ButtonStyle(
@@ -122,7 +112,7 @@ class LoginPage extends StatelessWidget {
                     if (states.contains(MaterialState.pressed)) {
                       return Colors.black;
                     }
-                    return Colors.black; // Default button color
+                    return Colors.black;
                   },
                 ),
               ),

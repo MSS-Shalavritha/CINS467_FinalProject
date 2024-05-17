@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:assignment_project/screens/RestaurantView/RestaurantMenu.dart'; // Import RestaurantMenuPage
+import 'package:assignment_project/screens/RestaurantView/RestaurantMenu.dart';
 
 class LocateRestaurant extends StatefulWidget {
   final String restaurantID;
@@ -16,24 +16,27 @@ class LocateRestaurant extends StatefulWidget {
 class _LocateRestaurantState extends State<LocateRestaurant> {
   late GoogleMapController mapController;
   final LatLng _center = const LatLng(39.728493, -121.837479);
-  Marker? _selectedMarker; // Variable to hold the selected marker
-  String _message = ''; // Message to be displayed in the scaffold
+  Marker? _selectedMarker;
+  String _message = '';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Locate Restaurant'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              // Navigate to add menu page
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => RestaurantMenuPage(restaurantID: widget.restaurantID)),
-              );
-            },
+        backgroundColor: Colors.yellow[100],
+          title: Text('Locate Restaurant'),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => RestaurantMenuPage(restaurantID: widget.restaurantID)),
+                );
+              },
+              child: Text('Add Menu'),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white, backgroundColor: Colors.black,
+              ),
           ),
         ],
       ),
@@ -54,14 +57,13 @@ class _LocateRestaurantState extends State<LocateRestaurant> {
                 infoWindow: const InfoWindow(
                   title: 'Restaurant Location',
                 ),
-                draggable: true, // Make marker draggable
+                draggable: true,
                 onTap: () {
                   setState(() {
                     _selectedMarker = null;
                   });
                 },
                 onDragEnd: (LatLng position) {
-                  // Update the marker position when dragged
                   setState(() {
                     _selectedMarker = Marker(
                       markerId: MarkerId('restaurantLocation'),
@@ -76,7 +78,6 @@ class _LocateRestaurantState extends State<LocateRestaurant> {
               ),
             },
             onTap: (LatLng position) {
-              // Check if tap position is close to a marker
               final markerPosition = _center;
               final distance = calculateDistance(position.latitude, position.longitude, markerPosition.latitude, markerPosition.longitude);
               if (distance < 50) {
@@ -102,7 +103,10 @@ class _LocateRestaurantState extends State<LocateRestaurant> {
             left: 16.0,
             child: ElevatedButton(
               onPressed: _setLocation,
-              child: Text('Set Location'), // Updated button text
+              child: Text('Set Location'),
+              style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white, backgroundColor: Colors.black,
+              ),
             ),
           ),
           if (_message.isNotEmpty)
@@ -134,7 +138,6 @@ class _LocateRestaurantState extends State<LocateRestaurant> {
       print('Latitude: $latitude, Longitude: $longitude');
 
       try {
-        // Save latitude and longitude details under the existing restaurant's ID
         await FirebaseFirestore.instance.collection('NewUpdates').doc(widget.restaurantID).update({
           'latitude': latitude,
           'longitude': longitude,

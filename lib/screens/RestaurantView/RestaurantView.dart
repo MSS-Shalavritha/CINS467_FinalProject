@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assignment_project/screens/RestaurantView/LocateRestaurant.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class RestaurantFormPage extends StatefulWidget {
   const RestaurantFormPage({Key? key, required this.title}) : super(key: key);
@@ -16,6 +19,7 @@ class _RestaurantFormPageState extends State<RestaurantFormPage> {
   late TextEditingController addressController;
   late TextEditingController phoneController;
   late TextEditingController landmarkController;
+  File? _image;
 
   @override
   void initState() {
@@ -105,6 +109,14 @@ class _RestaurantFormPageState extends State<RestaurantFormPage> {
             ),
             const SizedBox(height: 16.0),
             ElevatedButton(
+              onPressed: _uploadImage,
+              style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white, backgroundColor: Colors.black,
+              ),
+              child: Text(_image == null ? 'Upload Image' : 'Image Uploaded'),
+            ),
+            const SizedBox(height: 16.0),
+            ElevatedButton(
               onPressed: () async {
                 final restaurantName = nameController.text;
                 final address = addressController.text;
@@ -112,7 +124,6 @@ class _RestaurantFormPageState extends State<RestaurantFormPage> {
                 final landmark = landmarkController.text;
 
                 try {
-                  // Save restaurant details in Firestore with auto-generated ID
                   DocumentReference docRef = await FirebaseFirestore.instance.collection('NewUpdates').add({
                     'restaurantName': restaurantName,
                     'address': address,
@@ -120,9 +131,14 @@ class _RestaurantFormPageState extends State<RestaurantFormPage> {
                     'landmark': landmark,
                   });
 
-                  String restaurantID = docRef.id; // Get the auto-generated RestaurantID
-
-                  // Navigate to LocateRestaurant and pass the RestaurantID
+                  String restaurantID = docRef.id;
+                  if (_image != null) {
+                    final Reference storageRef = FirebaseStorage.instance.ref().child('restaurant_images/${DateTime.now().millisecondsSinceEpoch}.jpg');
+                    final UploadTask uploadTask = storageRef.putFile(_image!);
+                    final TaskSnapshot downloadUrl = (await uploadTask.whenComplete(() => null)!);
+                    final String imageUrl = await downloadUrl.ref.getDownloadURL();
+                    await docRef.update({'imageUrl': imageUrl});
+                  }
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => LocateRestaurant(restaurantID: restaurantID)),
@@ -137,11 +153,25 @@ class _RestaurantFormPageState extends State<RestaurantFormPage> {
                   );
                 }
               },
-              child: const Text('Locate on Map'), // Updated button text
+              child: const Text('Locate on Map'),
+              style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white, backgroundColor: Colors.black,
+              ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _uploadImage() async {
+    final imagePicker = ImagePicker();
+    final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
   }
 }

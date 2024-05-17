@@ -1,5 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:assignment_project/screens/HomePage/HomePage.dart';
+import 'package:image_picker/image_picker.dart';
 
 class RestaurantMenuPage extends StatefulWidget {
   final String restaurantID;
@@ -15,6 +19,7 @@ class _RestaurantMenuPageState extends State<RestaurantMenuPage> {
   late TextEditingController itemNameController;
   late TextEditingController descriptionController;
   late TextEditingController priceController;
+  File? _image;
 
   @override
   void initState() {
@@ -37,62 +42,164 @@ class _RestaurantMenuPageState extends State<RestaurantMenuPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Add Menu Item'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            TextFormField(
-              controller: itemNumberController,
-              decoration: InputDecoration(
-                labelText: 'Item Number',
+    backgroundColor: Colors.yellow[100],
+    appBar: AppBar(
+      title: Text('Add Menu Item'),
+      backgroundColor: Colors.yellow[100],
+    ),
+    body: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          TextFormField(
+            controller: itemNumberController,
+            style: TextStyle(color: Colors.black),
+            decoration: InputDecoration(
+              labelText: 'Item Number',
+              labelStyle: TextStyle(color: Colors.black),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
               ),
             ),
-            TextFormField(
-              controller: itemNameController,
-              decoration: InputDecoration(
-                labelText: 'Item Name',
+          ),
+          SizedBox(height: 16.0),
+          TextFormField(
+            controller: itemNameController,
+            style: TextStyle(color: Colors.black),
+            decoration: InputDecoration(
+              labelText: 'Item Name',
+              labelStyle: TextStyle(color: Colors.black),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
               ),
             ),
-            TextFormField(
-              controller: descriptionController,
-              decoration: InputDecoration(
-                labelText: 'Description',
+          ),
+          SizedBox(height: 16.0),
+          TextFormField(
+            controller: descriptionController,
+            style: TextStyle(color: Colors.black),
+            decoration: InputDecoration(
+              labelText: 'Description',
+              labelStyle: TextStyle(color: Colors.black),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
               ),
             ),
-            TextFormField(
-              controller: priceController,
-              decoration: InputDecoration(
-                labelText: 'Price',
+          ),
+          SizedBox(height: 16.0),
+          TextFormField(
+            controller: priceController,
+            style: TextStyle(color: Colors.black),
+            decoration: InputDecoration(
+              labelText: 'Price',
+              labelStyle: TextStyle(color: Colors.black),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
               ),
             ),
-            SizedBox(height: 16.0),
-            Row(
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Add menu item to Firestore
-                    _addMenuItem();
-                  },
-                  child: Text('Add More'),
+          ),
+          SizedBox(height: 16.0),
+          ElevatedButton(
+            onPressed: _uploadImage,
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                (Set<MaterialState> states) {
+                  if (states.contains(MaterialState.pressed)) {
+                    return Colors.black;
+                  }
+                  return Colors.black;
+                },
+              ),
+            ),
+            child: Text(
+              'Upload Image',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          SizedBox(height: 16.0),
+          _image != null
+              ? Image.file(
+                  _image!,
+                  height: 100,
+                  width: 100,
+                  fit: BoxFit.cover,
+                )
+              : Container(),
+          SizedBox(height: 16.0),
+          Row(
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  _addMenuItem();
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.pressed)) {
+                        return Colors.black;
+                      }
+                      return Colors.black;
+                    },
+                  ),
                 ),
-                SizedBox(width: 16.0),
-                ElevatedButton(
-                  onPressed: () {
-                    // Complete menu addition process
-                    // You can navigate to another screen or perform any other action here
-                  },
-                  child: Text('Complete'),
+                child: Text(
+                  'Add More',
+                  style: TextStyle(color: Colors.white),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+              SizedBox(width: 16.0),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Homepage()),
+                  );
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.pressed)) {
+                        return Colors.black;
+                      }
+                      return Colors.black;
+                    },
+                  ),
+                ),
+                child: Text(
+                  'Complete',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
-    );
+    ),
+   );
+  }
+
+  Future<void> _uploadImage() async {
+    final imagePicker = ImagePicker();
+    final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
   }
 
   void _addMenuItem() async {
@@ -102,23 +209,38 @@ class _RestaurantMenuPageState extends State<RestaurantMenuPage> {
     final price = priceController.text;
 
     try {
-      // Save menu item details in Firestore under the restaurant's ID
-      await FirebaseFirestore.instance.collection('NewUpdates').doc(widget.restaurantID).collection('Menu').add({
-        'itemNumber': itemNumber,
-        'itemName': itemName,
-        'description': description,
-        'price': price,
-      });
+      if (_image != null) {
+        final Reference storageRef =
+            FirebaseStorage.instance.ref().child('menu_images/${DateTime.now().millisecondsSinceEpoch}.jpg');
+        final UploadTask uploadTask = storageRef.putFile(_image!);
+        final TaskSnapshot downloadUrl = (await uploadTask.whenComplete(() => null)!);
+        final String url = await downloadUrl.ref.getDownloadURL();
+        await FirebaseFirestore.instance.collection('NewUpdates').doc(widget.restaurantID).collection('Menu').add({
+          'itemNumber': itemNumber,
+          'itemName': itemName,
+          'description': description,
+          'price': price,
+          'imageUrl': url,
+        });
+      } else {
+        await FirebaseFirestore.instance.collection('NewUpdates').doc(widget.restaurantID).collection('Menu').add({
+          'itemNumber': itemNumber,
+          'itemName': itemName,
+          'description': description,
+          'price': price,
+        });
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Menu item added successfully')),
       );
-
-      // Clear text fields for the next item
       itemNumberController.clear();
       itemNameController.clear();
       descriptionController.clear();
       priceController.clear();
+      setState(() {
+        _image = null;
+      });
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error adding menu item: $error')),

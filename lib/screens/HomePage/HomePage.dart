@@ -8,24 +8,20 @@ class Homepage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Food Delivery App'),
-      ),
       body: Stack(
         children: [
-          // Background Image Container
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/istockphoto-1295633127-1024x1024.jpg'),
+                image: AssetImage('assets/FoodDelivery.png'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
-          // Content Centered on the Screen
-          Center(
+          Align(
+            alignment: Alignment.bottomCenter,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 ElevatedButton(
                   onPressed: () {
@@ -34,7 +30,15 @@ class Homepage extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => LoginPage()),
                     );
                   },
-                  child: Text('Login'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black.withOpacity(0.5),
+                    textStyle: TextStyle(color: Colors.white),
+                    side: BorderSide(color: Colors.white, width: 1),
+                  ),
+                  child: Text(
+                    'Login',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
@@ -44,7 +48,15 @@ class Homepage extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => Signup()),
                     );
                   },
-                  child: Text('Signup'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black.withOpacity(0.5),
+                    textStyle: TextStyle(color: Colors.white),
+                    side: BorderSide(color: Colors.white, width: 1),
+                  ),
+                  child: Text(
+                    'Signup',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ],
             ),
